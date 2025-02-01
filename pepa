@@ -4,18 +4,37 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { ShoppingCart } from "lucide-react";
 
 const products = [
-  { id: 1, name: "Plancha para el cabello", price: 120000, image: "/plancha.jpg" },
-  { id: 2, name: "Rizador profesional", price: 150000, image: "/rizador.jpg" },
-  { id: 3, name: "Secador iónico", price: 180000, image: "/secador.jpg" },
+  { id: 1, name: "Plancha para el cabello", price: 98900, image: "/plancha.jpg" },
+  { id: 2, name: "Rizador", price: 94900, image: "/rizador.jpg" },
+  { id: 3, name: "Promo Plancha + Rizador + ENVIO GRATIS", price: 168900, image: "/secador.jpg" },
 ];
 
 const Home = () => {
   const [cart, setCart] = useState([]);
 
-  const handleCheckout = () => {
-    const total = cart.reduce((acc, item) => acc + item.price, 0);
-    const url = `https://www.mercadopago.com.co/checkout/v1/redirect?pref_id=${total}`;
-    window.location.href = url;
+  const handleCheckout = async () => {
+    const items = cart.map((product) => ({
+      title: product.name,
+      quantity: 1,
+      currency_id: "COP",
+      unit_price: product.price,
+    }));
+
+    try {
+      const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer TU_ACCESS_TOKEN", // Reemplaza con tu Access Token
+        },
+        body: JSON.stringify({ items })
+      });
+      
+      const data = await response.json();
+      window.location.href = data.init_point;
+    } catch (error) {
+      console.error("Error al procesar el pago", error);
+    }
   };
 
   const addToCart = (product) => {

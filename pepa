@@ -1,0 +1,53 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { ShoppingCart } from "lucide-react";
+
+const products = [
+  { id: 1, name: "Plancha para el cabello", price: 120000, image: "/plancha.jpg" },
+  { id: 2, name: "Rizador profesional", price: 150000, image: "/rizador.jpg" },
+  { id: 3, name: "Secador iónico", price: 180000, image: "/secador.jpg" },
+];
+
+const Home = () => {
+  const [cart, setCart] = useState([]);
+
+  const handleCheckout = () => {
+    const total = cart.reduce((acc, item) => acc + item.price, 0);
+    const url = `https://www.mercadopago.com.co/checkout/v1/redirect?pref_id=${total}`;
+    window.location.href = url;
+  };
+
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Tienda de Productos para el Cabello</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {products.map((product) => (
+          <Card key={product.id} className="p-4 text-center">
+            <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-lg mb-2" />
+            <CardTitle>{product.name}</CardTitle>
+            <p className="text-lg font-semibold">COP {product.price.toLocaleString()}</p>
+            <Button className="mt-2" onClick={() => addToCart(product)}>
+              Agregar al carrito <ShoppingCart className="ml-2" size={16} />
+            </Button>
+          </Card>
+        ))}
+      </div>
+      {cart.length > 0 && (
+        <div className="mt-6 text-center">
+          <h2 className="text-xl font-bold">Carrito de Compras</h2>
+          <p>Total: COP {cart.reduce((acc, item) => acc + item.price, 0).toLocaleString()}</p>
+          <Button className="mt-2" onClick={handleCheckout}>
+            Proceder al pago
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Home;
